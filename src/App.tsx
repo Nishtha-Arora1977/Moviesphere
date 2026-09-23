@@ -162,7 +162,7 @@ const IMAGE_BASE = 'https://image.tmdb.org/t/p/w500'
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY
 const USE_DIRECT_TMDB = import.meta.env.DEV && Boolean(API_KEY)
 const FALLBACK_POSTER =
-  'https://placehold.co/500x750/1b1a18/f4efe6?text=Poster+Unavailable'
+  'https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg'
 const TMDB_CACHE_TTL_MS = 10 * 60 * 1000
 const DETAIL_CACHE_TTL_MS = 15 * 60 * 1000
 const MAX_TMDB_CACHE_ENTRIES = 80
@@ -608,7 +608,9 @@ function getYear(date?: string) {
 }
 
 function getPoster(movie: Movie) {
-  return movie.poster_path ? `${IMAGE_BASE}${movie.poster_path}` : FALLBACK_POSTER
+  if (movie.poster_path) return `${IMAGE_BASE}${movie.poster_path}`
+  if (movie.backdrop_path) return `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`
+  return FALLBACK_POSTER
 }
 
 function getPosterSrcSet(movie: Movie) {
@@ -1735,11 +1737,12 @@ function App() {
               decoding="async"
               id="heroShakeImg"
               loading="eager"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_POSTER }}
               sizes="(max-width: 900px) 320px, 500px"
               src={
                 displayMovie
                   ? getPoster(displayMovie)
-                  : 'https://placehold.co/500x750/1b1a18/f4efe6?text=MovieSphere'
+                  : FALLBACK_POSTER
               }
               srcSet={displayMovie ? getPosterSrcSet(displayMovie) : undefined}
             />
@@ -1935,6 +1938,7 @@ function App() {
                   className="card-img"
                   decoding="async"
                   loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_POSTER }}
                   sizes="220px"
                   src={getPoster(movie)}
                   srcSet={getPosterSrcSet(movie)}
@@ -2046,11 +2050,12 @@ function App() {
                 alt={spotlightMovie ? `${spotlightMovie.title} poster` : 'MovieSphere pick'}
                 decoding="async"
                 loading="lazy"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_POSTER }}
                 sizes="(max-width: 900px) 320px, 420px"
                 src={
                   spotlightMovie
                     ? getPoster(spotlightMovie)
-                    : 'https://placehold.co/700x900/16131f/fef5e7?text=MovieSphere'
+                    : FALLBACK_POSTER
                 }
                 srcSet={spotlightMovie ? getPosterSrcSet(spotlightMovie) : undefined}
               />
@@ -2236,6 +2241,7 @@ function App() {
                     className="detail-poster"
                     decoding="async"
                     loading="eager"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_POSTER }}
                     sizes="(max-width: 900px) 320px, 420px"
                     src={getPoster(detailMovie)}
                     srcSet={getPosterSrcSet(detailMovie)}
@@ -2380,6 +2386,7 @@ function App() {
                                 alt={`${movie.title} poster`}
                                 decoding="async"
                                 loading="lazy"
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_POSTER }}
                                 sizes="180px"
                                 src={getPoster(movie)}
                                 srcSet={getPosterSrcSet(movie)}
@@ -2541,6 +2548,7 @@ function App() {
                     alt={`${movie.title} poster`}
                     decoding="async"
                     loading="lazy"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_POSTER }}
                     sizes="220px"
                     src={getPoster(movie)}
                     srcSet={getPosterSrcSet(movie)}
